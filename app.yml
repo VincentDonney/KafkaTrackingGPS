@@ -1,0 +1,13 @@
+# applications
+version: '3'
+services:
+  web-app:
+    build: ./app
+    container_name: flask_app
+    depends_on:
+      - kafka
+      - postgres
+    ports:
+      - "8000:8000"
+    networks:
+      - kafka-net
