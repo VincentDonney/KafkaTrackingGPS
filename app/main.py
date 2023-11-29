@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from kafka import KafkaConsumer
 import httpx
 
 app = FastAPI()
@@ -19,11 +20,13 @@ kafka_settings = {
     'auto_offset_reset': 'earliest'
 }
 
+
 # Function to fetch data from the database
 async def fetch_data_from_database():
     async with httpx.AsyncClient() as client:
         response = await client.get('http://database:5432/query')  # Replace with your database endpoint
         return response.json()
+
 
 # FastAPI endpoint to simulate fetching data
 @app.get("/fetch-data")

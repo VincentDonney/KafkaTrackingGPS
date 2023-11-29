@@ -3,7 +3,7 @@ version: '3'
 services:
   web-app:
     build: ./app
-    container_name: flask_app
+    container_name: fastapi
     depends_on:
       - kafka
       - postgres
