@@ -1,0 +1,13 @@
+# producer
+version: '3'
+services:
+  kafka-producer:
+    build: ./producer
+    container_name: kafka-producer
+    environment:
+      - KAFKA_BROKER=kafka:9092
+    depends_on:
+      - kafka
+    networks:
+      - kafka-net
+

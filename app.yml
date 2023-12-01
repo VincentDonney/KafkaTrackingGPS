@@ -3,11 +3,13 @@ version: '3'
 services:
   web-app:
     build: ./app
+    command: uvicorn main:app --host 0.0.0.0
     container_name: fastapi
+    ports:
+      - "8008:8000"
     depends_on:
       - kafka
       - postgres
-    ports:
-      - "8000:8000"
+      - kafka-producer
     networks:
       - kafka-net

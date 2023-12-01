@@ -1,8 +1,7 @@
-from fastapi import FastAPI, HTTPException
-from kafka import KafkaConsumer
-import httpx
+from fastapi import FastAPI, BackgroundTasks
+from confluent_kafka import Consumer, KafkaException
 
-app = FastAPI()
+app = FastAPI(title="Fastapi")
 
 # Database connection settings
 db_settings = {
@@ -13,28 +12,63 @@ db_settings = {
     'port': '5432'
 }
 
-# Kafka consumer settings   
+# Kafka consumer settings
 kafka_settings = {
-    'bootstrap_servers': 'kafka:9092',
-    'group_id': 'web_consumer_group',
-    'auto_offset_reset': 'earliest'
+    'bootstrap.servers': 'kafka:9092',
+    'group.id': 'web_consumer_group',
+    'auto.offset.reset': 'earliest'
 }
 
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the FastAPI main page!"}
 
-# Function to fetch data from the database
-async def fetch_data_from_database():
-    async with httpx.AsyncClient() as client:
-        response = await client.get('http://database:5432/query')  # Replace with your database endpoint
-        return response.json()
+# Function to consume messages from Kafka
+def consume_kafka_messages():
+    consumer = Consumer(kafka_settings)
+    # Subscribe to the "coordinates" topic
+    consumer.subscribe(['coordinates'])
+    try:
+        while True:
+            msg = consumer.poll(1.0)
+            if msg is None:
+                continue
+            if msg.error():
+                if msg.error().code() == KafkaException._PARTITION_EOF:
+                    continue
+                else:
+                    print(msg.error())
+                    break
+            print(f'Received message: {msg.value().decode("utf-8")}')
+    finally:
+        consumer.close()
 
+"""
+# Background task to start the Kafka consumer
+def start_kafka_consumer(background_tasks: BackgroundTasks):
+    background_tasks.add_task(consume_kafka_messages)
+"""
 
-# FastAPI endpoint to simulate fetching data
-@app.get("/fetch-data")
-async def fetch_data():
-    # Fetch data from the database
-    data_from_db = await fetch_data_from_database()
-
-    # Process the fetched data (replace this with your actual logic)
-    processed_data = {"message": "Data processed successfully", "data": data_from_db}
-    
-    return processed_data
+@app.get("/see_messages")
+async def see_messages():
+    messages = []
+    i = 0
+    consumer = Consumer(kafka_settings)
+    consumer.subscribe(['coordinates'])
+    try:
+        while i < 2:
+            msg = consumer.poll(1.0)
+            if msg is None:
+                continue
+            if msg.error():
+                if msg.error().code() == KafkaException._PARTITION_EOF:
+                    continue
+                else:
+                    print(msg.error())
+                    break
+            print(f'Received message: {msg.value().decode("utf-8")}')
+            i += 1
+            messages.append({msg.value().decode("utf-8")})
+    finally:
+        consumer.close()
+    return messages
