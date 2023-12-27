@@ -9,8 +9,11 @@ import { WebsocketService } from '../service/websocket.service';
 })
 export class MapComponent implements AfterViewInit {
   private map: any;
+  private markerMoving: boolean = false;
   public number: string = '';
-  public allowMoving: boolean = false;
+  private pos1: any;
+  private trail: any[] = [];
+  private trailPolyline : any;
 
   constructor(private websocket: WebsocketService) {}
 
@@ -27,18 +30,45 @@ export class MapComponent implements AfterViewInit {
       attribution: '© OpenStreetMap contributors',
       maxZoom: 18
     }).addTo(this.map);
-
-    const pos1 = L.marker([51.5, -0.09]).addTo(this.map).bindPopup('Pos 1');
-
+  
+    this.pos1 = L.circleMarker([51.5, -0.09], {
+      color: 'blue',
+      fillColor: 'blue',
+      fillOpacity: 1,
+      radius: 10,
+    }).addTo(this.map).bindPopup('Pos 1');
+  
+    this.trailPolyline = L.polyline([], {
+      color: 'gray',
+      weight: 4,
+      opacity: 0.8,
+      lineJoin: 'round',
+      dashArray: '5, 10',
+    });
+  
+    this.trailPolyline.addTo(this.map);
+  
     setInterval(() => {
-      if (this.allowMoving){
-      const currentLatLng = pos1.getLatLng();
-      pos1.setLatLng([currentLatLng.lat + 0.01, currentLatLng.lng]);
+      if (this.markerMoving) {
+        const currentLatLng = this.pos1.getLatLng();
+        this.pos1.setLatLng([currentLatLng.lat + 0.001, currentLatLng.lng]);
+    
+        this.trail.push([currentLatLng.lat + 0.001, currentLatLng.lng]);
+        if (this.trail.length > 400) {
+          this.trail.shift();
+        }    
+        this.trailPolyline.setLatLngs(this.trail);
+        
+        this.pos1.bringToFront();
 
-      this.map.setView([currentLatLng.lat, currentLatLng.lng]);
+        this.map.setView([currentLatLng.lat, currentLatLng.lng]);
       }
+    }, 100);
+  }
+  
 
-    }, 1000);
+  toggleMarkerMovement(): void {
+    this.markerMoving = !this.markerMoving;
   }
 
   ngOnDestroy() {
