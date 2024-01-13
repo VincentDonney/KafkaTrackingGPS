@@ -1,5 +1,10 @@
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, HTTPException
 from confluent_kafka import Consumer, KafkaException
+import threading
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+import psycopg2
+from psycopg2 import sql
 
 app = FastAPI(title="Fastapi")
 
@@ -19,35 +24,11 @@ kafka_settings = {
     'auto.offset.reset': 'earliest'
 }
 
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the FastAPI main page!"}
 
-# Function to consume messages from Kafka
-def consume_kafka_messages():
-    consumer = Consumer(kafka_settings)
-    # Subscribe to the "coordinates" topic
-    consumer.subscribe(['coordinates'])
-    try:
-        while True:
-            msg = consumer.poll(1.0)
-            if msg is None:
-                continue
-            if msg.error():
-                if msg.error().code() == KafkaException._PARTITION_EOF:
-                    continue
-                else:
-                    print(msg.error())
-                    break
-            print(f'Received message: {msg.value().decode("utf-8")}')
-    finally:
-        consumer.close()
-
-"""
-# Background task to start the Kafka consumer
-def start_kafka_consumer(background_tasks: BackgroundTasks):
-    background_tasks.add_task(consume_kafka_messages)
-"""
 
 @app.get("/see_messages")
 async def see_messages():
@@ -71,4 +52,26 @@ async def see_messages():
             messages.append({msg.value().decode("utf-8")})
     finally:
         consumer.close()
+    push_data_to_database(messages)
     return messages
+
+
+def push_data_to_database(processed_data):
+    conn = psycopg2.connect(
+        host="database",
+        database="db",
+        user="user",
+        password="pwd"
+    )
+    """
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("INSERT INTO coordinates (timestamp, x, y) VALUES (%s, %s, %s)",
+                           (processed_data['timestamp'], processed_data['x'], processed_data['y']))
+        conn.commit()
+    finally:
+        conn.close()"""
+    
+#@app.get("/state")
+#async def state():
+#    

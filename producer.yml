@@ -11,3 +11,12 @@ services:
     networks:
       - kafka-net
 
+  kafka-producer2:
+    build: ./producer
+    container_name: kafka-producer2
+    environment:
+      - KAFKA_BROKER=kafka:9092
+    depends_on:
+      - kafka
+    networks:
+      - kafka-net

@@ -3,8 +3,11 @@ version: '3'
 services:
   web-app:
     build: ./app
-    command: uvicorn main:app --host 0.0.0.0
     container_name: fastapi
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pwd
     ports:
       - "8008:8000"
     depends_on:
