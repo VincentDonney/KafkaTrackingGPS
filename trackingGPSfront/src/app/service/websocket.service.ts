@@ -1,13 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Socket } from 'ngx-socket-io';
+import { webSocket, WebSocketSubject} from 'rxjs/webSocket'
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebsocketService {
-  constructor(private socket: Socket) {}
+  private socket$: WebSocketSubject<any> | null = null
 
-  getNumber(){
-    return this.socket.fromEvent<string>('message');
+  public connect():void {
+    this.socket$ = webSocket('ws://localhost:8000/ws');
   }
+
+  public getMessages() {
+    return this.socket$?.asObservable();
+  }
+
 }

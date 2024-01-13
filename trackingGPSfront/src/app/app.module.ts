@@ -7,8 +7,6 @@ import { AppComponent } from './app.component';
 import { MapComponent } from './map/map.component';
 
 
-const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -17,7 +15,6 @@ const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
   imports: [
     BrowserModule,
     AppRoutingModule,
-    SocketIoModule.forRoot(config)
   ],
   providers: [],
   bootstrap: [AppComponent]
