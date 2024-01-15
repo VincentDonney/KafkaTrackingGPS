@@ -5,17 +5,10 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import psycopg2
 from psycopg2 import sql
+import json
+from datetime import datetime
 
 app = FastAPI(title="Fastapi")
-
-# Database connection settings
-db_settings = {
-    'dbname': 'db',
-    'user': 'user',
-    'password': 'pwd',
-    'host': 'database',
-    'port': '5432'
-}
 
 # Kafka consumer settings
 kafka_settings = {
@@ -37,7 +30,7 @@ async def see_messages():
     consumer = Consumer(kafka_settings)
     consumer.subscribe(['coordinates'])
     try:
-        while i < 2:
+        while i < 1:
             msg = consumer.poll(1.0)
             if msg is None:
                 continue
@@ -50,28 +43,29 @@ async def see_messages():
             print(f'Received message: {msg.value().decode("utf-8")}')
             i += 1
             messages.append({msg.value().decode("utf-8")})
+            go = {msg.value().decode("utf-8")}
     finally:
         consumer.close()
-    push_data_to_database(messages)
-    return messages
+    end = push_data_to_database(go)
+    return end
 
 
 def push_data_to_database(processed_data):
     conn = psycopg2.connect(
         host="database",
-        database="db",
-        user="user",
-        password="pwd"
+        database="pg",
+        user="pg",
+        password="pg"
     )
+    
     """
     try:
         with conn.cursor() as cursor:
-            cursor.execute("INSERT INTO coordinates (timestamp, x, y) VALUES (%s, %s, %s)",
-                           (processed_data['timestamp'], processed_data['x'], processed_data['y']))
+            cursor.execute("INSERT INTO coordinates (id, timestamp, x, y) VALUES (%s, %s, %s, %s)",
+                           (id, timestamp, x, y))
         conn.commit()
     finally:
-        conn.close()"""
+        conn.close()
+    """
+    return (id_value)
     
-#@app.get("/state")
-#async def state():
-#    
