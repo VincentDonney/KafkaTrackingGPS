@@ -57,15 +57,32 @@ def push_data_to_database(processed_data):
         user="pg",
         password="pg"
     )
-    
-    """
+    values = message_processor(processed_data)
     try:
         with conn.cursor() as cursor:
+            timestamp = datetime.fromtimestamp(values["timestamp"])
             cursor.execute("INSERT INTO coordinates (id, timestamp, x, y) VALUES (%s, %s, %s, %s)",
-                           (id, timestamp, x, y))
+                           (values["id"], timestamp, values["x"], values["y"]))
         conn.commit()
     finally:
         conn.close()
-    """
-    return (id_value)
+    return (values)
     
+
+def message_processor(input):
+    message = ""
+    for i in input:
+        message += i
+    parsed_message = json.loads(message)
+    id = parsed_message["id"][0]
+    timestamp = parsed_message["timestamp"]
+    x = parsed_message["x"]
+    y = parsed_message["y"]
+    values = {
+        "id": id,
+        "timestamp": timestamp,
+        "x": x,
+        "y": y
+    }
+    return values
+
