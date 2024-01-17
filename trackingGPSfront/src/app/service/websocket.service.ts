@@ -8,7 +8,7 @@ export class WebsocketService {
   private socket$: WebSocketSubject<any> | null = null
 
   public connect():void {
-    this.socket$ = webSocket('ws://localhost:8000/ws');
+    this.socket$ = webSocket('ws://localhost:8008/ws');
   }
 
   public getMessages() {

@@ -2,6 +2,8 @@ from confluent_kafka import Producer
 import json
 import time
 import random
+import math
+import os
 
 # Kafka producer settings
 kafka_broker = "kafka:9092"
@@ -9,16 +11,28 @@ kafka_settings = {
     'bootstrap.servers': kafka_broker,
 }
 
+# Function to generate coordinates along a 45° angle
+def generate_coordinates():
+    # Generate a random distance
+    distance = random.uniform(0, 0.001)
+    # Calculate x and y coordinates based on a 45° angle
+    angle = math.radians(45)  # Convert 45 degrees to radians
+    x = distance * math.cos(angle)
+    y = distance * math.sin(angle)
+    return x, y
+
+# Produce kafka message of coherently random position every 10s
 def produce_kafka_messages():
     producer = Producer(kafka_settings)
-    id = random.randint(1, 100),
+    id = os.getenv('id', '0')
     while True :
-        # Update coordinates with random values between 0 and 0.001
+        # Update coordinates with random values between 0 and 0.001 adn 45° angle
+        x, y = generate_coordinates()
         coordinate_entity = {
-            'id': id,  # You can adjust the ID generation logic as needed
+            'id': id,
             'timestamp': int(time.time()),
-            'x': random.uniform(0, 0.001),
-            'y': random.uniform(0, 0.001),
+            'x': x,
+            'y': y,
         }
         # Convert coordinate entity to JSON
         message_value = json.dumps(coordinate_entity)
@@ -27,7 +41,7 @@ def produce_kafka_messages():
         # Wait for any outstanding messages to be delivered and delivery reports received
         producer.flush()
         # Sleep for 10 seconds before producing the next message
-        time.sleep(10)
+        time.sleep(1)
 
 
 # Produce Kafka messages

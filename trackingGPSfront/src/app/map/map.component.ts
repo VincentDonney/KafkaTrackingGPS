@@ -20,7 +20,8 @@ export class MapComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.websocket.connect();
     this.websocket.getMessages()?.subscribe((message: any)=> {
-      this.number = message;
+      console.log(message[0])
+      this.number = message[0]['x'];
     })
     this.initMap();
   }

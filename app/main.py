@@ -1,4 +1,5 @@
-from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi import FastAPI, BackgroundTasks, HTTPException, WebSocket
+from fastapi.responses import HTMLResponse
 from confluent_kafka import Consumer, KafkaException
 import threading
 from fastapi.responses import JSONResponse
@@ -7,6 +8,7 @@ import psycopg2
 from psycopg2 import sql
 import json
 from datetime import datetime
+import time
 
 app = FastAPI(title="Fastapi")
 
@@ -25,7 +27,6 @@ def read_root():
 @app.get("/push_message")
 async def push_message():
     messages = []
-    i = 0
     consumer = Consumer(kafka_settings)
     consumer.subscribe(['coordinates'])
     try:
@@ -83,7 +84,7 @@ def message_processor(input):
     }
     return values
 
-# Fetches all messages from the database using a target id
+# Fetches last messages from the database
 @app.get("/get_messages")
 def get_messages():
     conn = psycopg2.connect(
@@ -94,7 +95,7 @@ def get_messages():
     )
     try:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT id, timestamp, x, y FROM coordinates")
+            cursor.execute("SELECT id, timestamp, x, y FROM coordinates ORDER BY timestamp DESC LIMIT 2")
             rows = cursor.fetchall()
             positions = []
             for row in rows:
@@ -110,3 +111,12 @@ def get_messages():
     finally:
         conn.close()
     return positions
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        _ = push_message()
+        await websocket.send_text(json.dumps(get_messages()))
+        time.sleep(1)
+
