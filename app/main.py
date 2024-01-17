@@ -17,23 +17,22 @@ kafka_settings = {
     'auto.offset.reset': 'earliest'
 }
 
-
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the FastAPI main page!"}
 
-
-@app.get("/see_messages")
-async def see_messages():
+# Fetch all messages of kafka topic 'coordinates' and pushes them to the database
+@app.get("/push_message")
+async def push_message():
     messages = []
     i = 0
     consumer = Consumer(kafka_settings)
     consumer.subscribe(['coordinates'])
     try:
-        while i < 1:
+        while True:
             msg = consumer.poll(1.0)
             if msg is None:
-                continue
+                break
             if msg.error():
                 if msg.error().code() == KafkaException._PARTITION_EOF:
                     continue
@@ -41,15 +40,14 @@ async def see_messages():
                     print(msg.error())
                     break
             print(f'Received message: {msg.value().decode("utf-8")}')
-            i += 1
             messages.append({msg.value().decode("utf-8")})
-            go = {msg.value().decode("utf-8")}
+            data = {msg.value().decode("utf-8")}
+            push_data_to_database(data)
     finally:
         consumer.close()
-    end = push_data_to_database(go)
-    return end
+    return "All positions have been pushed"
 
-
+# Pushes one message to the database
 def push_data_to_database(processed_data):
     conn = psycopg2.connect(
         host="database",
@@ -66,9 +64,8 @@ def push_data_to_database(processed_data):
         conn.commit()
     finally:
         conn.close()
-    return (values)
     
-
+# Processes one message into a valid object for the database
 def message_processor(input):
     message = ""
     for i in input:
@@ -86,3 +83,30 @@ def message_processor(input):
     }
     return values
 
+# Fetches all messages from the database using a target id
+@app.get("/get_messages")
+def get_messages():
+    conn = psycopg2.connect(
+        host="database",
+        database="pg",
+        user="pg",
+        password="pg"
+    )
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT id, timestamp, x, y FROM coordinates")
+            rows = cursor.fetchall()
+            positions = []
+            for row in rows:
+                id, timestamp, x, y = row
+                # Convert timestamp to Unix timestamp for consistent output
+                timestamp_unix = int(timestamp.timestamp())
+                positions.append({
+                    "id": id,
+                    "timestamp": timestamp_unix,
+                    "x": x,
+                    "y": y
+                })
+    finally:
+        conn.close()
+    return positions

@@ -3,11 +3,8 @@
 
 -- Create the 'coordinates' table
 CREATE TABLE coordinates (
-    id SERIAL PRIMARY KEY,
+    id integer NOT NULL,
     timestamp TIMESTAMP NOT NULL,
     x REAL NOT NULL,
     y REAL NOT NULL
 );
-
--- Insert data into the 'coordinates' table
-INSERT INTO coordinates (id, timestamp, x, y) VALUES (1, CURRENT_TIMESTAMP, 43.0, 3.0);
