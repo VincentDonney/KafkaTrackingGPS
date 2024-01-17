@@ -94,7 +94,7 @@ def get_messages():
     )
     try:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT id, timestamp, x, y FROM coordinates")
+            cursor.execute("SELECT id, timestamp, x, y FROM coordinates ORDER BY timestamp DESC LIMIT 2")
             rows = cursor.fetchall()
             positions = []
             for row in rows:
