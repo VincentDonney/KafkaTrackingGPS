@@ -40,15 +40,17 @@ services:
   postgres:
     image: postgres:latest
     container_name: database
+    hostname: pg
     environment:
-      POSTGRES_DB: db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pwd
+      POSTGRES_DB: pg
+      POSTGRES_USER: pg
+      POSTGRES_PASSWORD: pg
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
-
+    networks:
+      - kafka-net
 
 networks:
   kafka-net:

@@ -1,8 +1,10 @@
-CREATE TABLE coordinates (
-    id SERIAL PRIMARY KEY,
-    timestamp TIMESTAMP NOT NULL,
-    x FLOAT NOT NULL,
-    y FLOAT NOT NULL
-);
+-- Connect to the 'pg' database
+\connect pg;
 
-INSERT INTO coordinates (timestamp, x, y) VALUES (CURRENT_TIMESTAMP, 43.0, 3.0);
+-- Create the 'coordinates' table
+CREATE TABLE coordinates (
+    id integer NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
+    x REAL NOT NULL,
+    y REAL NOT NULL
+);
