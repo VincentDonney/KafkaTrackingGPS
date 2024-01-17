@@ -6,6 +6,7 @@ services:
     container_name: kafka-producer
     environment:
       - KAFKA_BROKER=kafka:9092
+      - id=1
     depends_on:
       - kafka
     networks:
@@ -16,6 +17,7 @@ services:
     container_name: kafka-producer2
     environment:
       - KAFKA_BROKER=kafka:9092
+      - id=2
     depends_on:
       - kafka
     networks:
