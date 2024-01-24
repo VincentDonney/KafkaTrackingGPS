@@ -21,7 +21,7 @@ def generate_coordinates():
     y = distance * math.sin(angle)
     return x, y
 
-# Produce kafka message of coherently random position every 10s
+# Produce kafka message of coherently random position every 5s
 def produce_kafka_messages():
     producer = Producer(kafka_settings)
     id = os.getenv('id', '0')
@@ -40,8 +40,8 @@ def produce_kafka_messages():
         producer.produce('coordinates', value=message_value)
         # Wait for any outstanding messages to be delivered and delivery reports received
         producer.flush()
-        # Sleep for 10 seconds before producing the next message
-        time.sleep(1)
+        # Sleep for 5 seconds before producing the next message
+        time.sleep(5)
 
 
 # Produce Kafka messages
