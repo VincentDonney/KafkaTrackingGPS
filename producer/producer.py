@@ -40,8 +40,8 @@ def produce_kafka_messages():
         producer.produce('coordinates', value=message_value)
         # Wait for any outstanding messages to be delivered and delivery reports received
         producer.flush()
-        # Sleep for 10 seconds before producing the next message
-        time.sleep(10)
+        # Sleep for 5 seconds before producing the next message
+        time.sleep(5)
 
 
 # Produce Kafka messages
