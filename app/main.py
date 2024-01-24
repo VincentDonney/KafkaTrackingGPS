@@ -181,4 +181,4 @@ async def pasweb(websocket: WebSocket):
                 #file.write("\n")  # Add a newline to separate entries
         await websocket.send_text(json.dumps(positions))
         del positions
-        time.sleep(1)
+        time.sleep(5)

@@ -21,7 +21,7 @@ def generate_coordinates():
     y = distance * math.sin(angle)
     return x, y
 
-# Produce kafka message of coherently random position every 10s
+# Produce kafka message of coherently random position every 5s
 def produce_kafka_messages():
     producer = Producer(kafka_settings)
     id = os.getenv('id', '0')
