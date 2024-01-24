@@ -21,7 +21,6 @@ export class MapComponent implements AfterViewInit {
     this.websocket.connect();
     this.websocket.getMessages()?.subscribe((message: any)=> {
       console.log(message[0])
-      this.number = message[0]['x'];
     })
     this.initMap();
   }
