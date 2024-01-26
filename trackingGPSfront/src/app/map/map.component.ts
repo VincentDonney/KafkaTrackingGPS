@@ -33,9 +33,12 @@ export class MapComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.websocket.connect();
     this.websocket.getMessages()?.subscribe((message: any)=> {
-      let coords1 = {lat:message[0]['x'], lng:message[0]['y']};
-      let coords2 = {lat: message[1]['x'], lng: message[1]['y']};
-      this.updateCoords(coords1,coords2);
+      if(message){
+        let coords1 = {lat:message[0]['x'], lng:message[0]['y']};
+        let coords2 = {lat: message[1]['x'], lng: message[1]['y']};
+        this.updateCoords(coords1,coords2);
+      }
+  
     })
     this.initMap();
   }
