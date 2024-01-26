@@ -13,13 +13,13 @@ export class MapComponent implements AfterViewInit {
     color: 'blue',
     fillColor: 'blue',
     fillOpacity: 1,
-    radius: 10,
+    radius: 7,
   });
   private pos2 = L.circleMarker([0, 0], {
     color: 'red',
     fillColor: 'red',
     fillOpacity: 1,
-    radius: 10,
+    radius: 7,
   });
   private focusToggled1: boolean = false;
   private trail1: any[] = [];
@@ -32,11 +32,16 @@ export class MapComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.websocket.connect();
+    console.log("bb");
     this.websocket.getMessages()?.subscribe((message: any)=> {
       let coords1 = {lat:message[0]['x'], lng:message[0]['y']};
       let coords2 = {lat: message[1]['x'], lng: message[1]['y']};
+      console.log(coords1);
+      console.log(coords2);
+      console.log("aaa");
       this.updateCoords(coords1,coords2);
     })
+    console.log("ccc");
     this.initMap();
   }
 
@@ -69,7 +74,7 @@ export class MapComponent implements AfterViewInit {
     this.pos2.setPopupContent(display);
 
     this.trailPolyline1 = L.polyline([], {
-      color: 'gray',
+      color: 'blue',
       weight: 4,
       opacity: 0.8,
       lineJoin: 'round',
@@ -78,7 +83,7 @@ export class MapComponent implements AfterViewInit {
     this.trailPolyline1.addTo(this.map);
 
     this.trailPolyline2 = L.polyline([], {
-      color: 'gray',
+      color: 'red',
       weight: 4,
       opacity: 0.8,
       lineJoin: 'round',
