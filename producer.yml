@@ -7,8 +7,8 @@ services:
     environment:
       - KAFKA_BROKER=kafka:9092
       - id=1
-      - x=48
-      - y=2
+      - x=49.43742987885597 
+      - y=11.090147027822049
     depends_on:
       - kafka
     networks:
@@ -20,8 +20,8 @@ services:
     environment:
       - KAFKA_BROKER=kafka:9092
       - id=2
-      - x=41
-      - y=2
+      - x=45.74505320159049 
+      - y=4.8542187705193
     depends_on:
       - kafka
     networks:

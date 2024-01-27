@@ -13,13 +13,13 @@ export class MapComponent implements AfterViewInit {
     color: 'blue',
     fillColor: 'blue',
     fillOpacity: 1,
-    radius: 10,
+    radius: 8,
   });
   private pos2 = L.circleMarker([0, 0], {
     color: 'red',
     fillColor: 'red',
     fillOpacity: 1,
-    radius: 10,
+    radius: 8,
   });
   private focusToggled1: boolean = false;
   private trail1: any[] = [];
@@ -44,13 +44,14 @@ export class MapComponent implements AfterViewInit {
   }
 
   initMap(): void {
-    this.map = L.map('map').setView([0, 0], 18).on('click', () => {
+    this.map = L.map('map').setView([47, 7], 7).on('click', () => {
       this.focusToggled1 = false;
       this.focusToggled2 = false;
     });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
-      maxZoom: 19
+      maxZoom: 19,
+      minZoom: 3
     }).addTo(this.map);
   
     this.pos1.addTo(this.map).on('click', ( () => {
@@ -72,7 +73,7 @@ export class MapComponent implements AfterViewInit {
     this.pos2.setPopupContent(display);
 
     this.trailPolyline1 = L.polyline([], {
-      color: 'gray',
+      color: 'blue',
       weight: 4,
       opacity: 0.8,
       lineJoin: 'round',
@@ -81,7 +82,7 @@ export class MapComponent implements AfterViewInit {
     this.trailPolyline1.addTo(this.map);
 
     this.trailPolyline2 = L.polyline([], {
-      color: 'gray',
+      color: 'red',
       weight: 4,
       opacity: 0.8,
       lineJoin: 'round',

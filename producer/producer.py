@@ -11,10 +11,10 @@ kafka_settings = {
     'bootstrap.servers': kafka_broker,
 }
 
-# Function to generate coordinates along a 45° angle
+# Function to generate coordinates
 def generate_coordinates(x, y):
-    x += random.uniform(-0.001, 0.001)
-    y += random.uniform(-0.001, 0.001)
+    x = x + random.uniform(0.00005, 0.0006) * random.randint(-1, 1)
+    y = y + random.uniform(0.00005, 0.0006) * random.randint(-1, 1)
     return x, y
 
 # Produce kafka message of coherently random position every 5s
@@ -24,8 +24,7 @@ def produce_kafka_messages():
     x = os.getenv('x', '0')
     y = os.getenv('y', '0')
     while True :
-        # Update coordinates with random values between 0 and 0.001 adn 45° angle
-        x, y = generate_coordinates(int(x), int(y))
+        x, y = generate_coordinates(float(x), float(y))
         coordinate_entity = {
             'id': id,
             'timestamp': int(time.time()),
