@@ -8,6 +8,7 @@ import { WebsocketService } from '../service/websocket.service';
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements AfterViewInit {
+  private numPoints:number = 0;
   private map: any;
   private pos1 = L.circleMarker([0, 0], {
     color: 'blue',
@@ -119,7 +120,25 @@ export class MapComponent implements AfterViewInit {
     if (this.focusToggled2)
       this.map.setView([currentLatLng2.lat, currentLatLng2.lng]);
   }
-  
+
+  changeView(){
+    switch(this.numPoints){
+      case 0:
+        this.focusToggled1 = true;
+        this.focusToggled2 = false;
+        this.map.setView(this.pos1.getLatLng(),17);
+        break;
+      case 1:
+        this.focusToggled1 = false;
+        this.focusToggled2 = true;
+        this.map.setView(this.pos1.getLatLng(),17);
+        break;
+      default:
+        break;
+    }
+    this.numPoints = (this.numPoints + 1) % 2;
+  }  
+
   ngOnDestroy() {
     this.map.remove();
   }
