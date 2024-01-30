@@ -88,26 +88,26 @@ def message_processor(input):
 @app.get("/get_messages")
 def get_messages():
     conn = psycopg2.connect(
-        host="database",
-        database="pg",
-        user="pg",
-        password="pg"
-    )
+            host="database",
+            database="pg",
+            user="pg",
+            password="pg"
+        )
     try:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT id, timestamp, x, y FROM coordinates ORDER BY timestamp DESC LIMIT 2")
+            cursor.execute("SELECT id, timestamp, x, y FROM coordinates ORDER BY timestamp DESC LIMIT 5")
             rows = cursor.fetchall()
-            positions = []
+            positions = {}
             for row in rows:
                 id, timestamp, x, y = row
                 # Convert timestamp to Unix timestamp for consistent output
                 timestamp_unix = int(timestamp.timestamp())
-                positions.append({
-                    "id": id,
+                positions[id]= {
                     "timestamp": timestamp_unix,
                     "x": x,
                     "y": y
-                })
+                }
+                
     finally:
         conn.close()
     return positions
@@ -117,67 +117,8 @@ def get_messages():
 async def pasweb(websocket: WebSocket):
     await websocket.accept()
     while True:
-        messages = []
-        consumer = Consumer(kafka_settings)
-        consumer.subscribe(['coordinates'])
-        #Health check 
-        #file_path = 'res.txt'
-        #with open(file_path, 'a') as file:
-        #    file.write("0")
-        try:
-            while True:
-                msg = consumer.poll(1.0)
-                if msg is None:
-                    break
-                if msg.error():
-                    if msg.error().code() == KafkaException._PARTITION_EOF:
-                        continue
-                    else:
-                        print(msg.error())
-                        break
-                print(f'Received message: {msg.value().decode("utf-8")}')
-                messages.append({msg.value().decode("utf-8")})
-                data = {msg.value().decode("utf-8")}
-                push_data_to_database(data)
-        finally:
-            consumer.close()
-        #Health check
-        #with open(file_path, 'a') as file:
-        #    file.write("1")
-        # Health check
-        #with open(file_path, 'a') as file:
-        #    file.write("2")
-        conn = psycopg2.connect(
-            host="database",
-            database="pg",
-            user="pg",
-            password="pg"
-        )
-        try:
-            with conn.cursor() as cursor:
-                cursor.execute("SELECT id, timestamp, x, y FROM coordinates ORDER BY timestamp DESC LIMIT 5")
-                rows = cursor.fetchall()
-                positions = {}
-                for row in rows:
-                    id, timestamp, x, y = row
-                    # Convert timestamp to Unix timestamp for consistent output
-                    timestamp_unix = int(timestamp.timestamp())
-                    positions[id]= {
-                        "timestamp": timestamp_unix,
-                        "x": x,
-                        "y": y
-                    }
-                    # Health check
-                    #with open(file_path, 'a') as file:
-                    #    file.write("3")
-        finally:
-            conn.close()
-        # Health check
-        #with open(file_path, 'a') as file:
-            #for position in positions:
-                #for key, value in position.items():
-                    #file.write(f"{key}: {value}\n")
-                #file.write("\n")  # Add a newline to separate entries
+        await push_message()
+        positions = get_messages()
         await websocket.send_text(json.dumps(positions))
         del positions
         time.sleep(5)

@@ -20,7 +20,7 @@ export class MapComponent implements AfterViewInit {
     this.initMap();
     this.websocket.connect();
     this.websocket.getMessages()?.subscribe((message: any)=> {
-      //console.log(message)
+      console.log(message);
       if(message!==undefined){
         var coords:L.LatLngLiteral[] = [];
         for (let i = 1; i < 6; i++){
