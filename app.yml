@@ -16,3 +16,13 @@ services:
       - kafka-producer
     networks:
       - kafka-net
+
+  angular-app:
+    build: ./app/trackingGPSfront
+    container_name: angular
+    ports:
+      - "4200:80"
+    depends_on:
+      - web-app
+    networks:
+      - kafka-net

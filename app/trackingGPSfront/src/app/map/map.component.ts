@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, makeStateKey } from '@angular/core';
+import { Component, AfterViewInit} from '@angular/core';
 import * as L from 'leaflet';
 import { WebsocketService } from '../service/websocket.service';
 
@@ -10,134 +10,110 @@ import { WebsocketService } from '../service/websocket.service';
 export class MapComponent implements AfterViewInit {
   private numPoints:number = 0;
   private map: any;
-  private pos1 = L.circleMarker([0, 0], {
-    color: 'blue',
-    fillColor: 'blue',
-    fillOpacity: 1,
-    radius: 8,
-  });
-  private pos2 = L.circleMarker([0, 0], {
-    color: 'red',
-    fillColor: 'red',
-    fillOpacity: 1,
-    radius: 8,
-  });
-  private focusToggled1: boolean = false;
-  private trail1: any[] = [];
-  private trailPolyline1 : any;
-  private focusToggled2: boolean = false;
-  private trail2: any[] = [];
-  private trailPolyline2 : any;
+  private markers:L.Marker[] = [];
+  private trails: any[][] = [];
+  private polylines:L.Polyline[] = [];
+  private focus = new Array(5).fill(false);
+  
 
   constructor(private websocket: WebsocketService) {}
 
   ngAfterViewInit(): void {
+    this.initMap();
     this.websocket.connect();
     this.websocket.getMessages()?.subscribe((message: any)=> {
+      //console.log(message)
       if(message){
-        let coords1 = {lat:message[0]['x'], lng:message[0]['y']};
-        let coords2 = {lat: message[1]['x'], lng: message[1]['y']};
-        this.updateCoords(coords1,coords2);
+        var coords:L.LatLngLiteral[] = [];
+        for (let i = 1; i < 6; i++){
+          coords.push({lat:message[i.toString()]['x'], lng:message[i.toString()]['y']});
+        }
+        this.updateCoords(coords);
       }
-  
     })
-    this.initMap();
   }
 
   initMap(): void {
+    const imgFolderPath = "assets/img";
+    const files = [
+      "fatalis.png",
+      "malzeno.png",
+      "shagaru.png",
+      "rathalos.png",
+      "vaalstrax.png"
+    ];
+    const colors = ['black', 'red', 'green', 'orange', 'purple'];
     this.map = L.map('map').setView([47, 7], 7).on('click', () => {
-      this.focusToggled1 = false;
-      this.focusToggled2 = false;
+      this.focus.fill(false);
     });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
       maxZoom: 19,
       minZoom: 3
     }).addTo(this.map);
-  
-    this.pos1.addTo(this.map).on('click', ( () => {
-      this.focusToggled1 = true;
-      this.focusToggled2 = false;
-    })).bindPopup('Pos 1');
 
-    this.pos2.addTo(this.map).on('click', ( () => {
-      this.focusToggled2 = true;
-      this.focusToggled1 = false;
-    })).bindPopup('Pos 2');
+    var i = 0;
+    files.forEach(file => {
+      //Create an icon
+      const icon = L.icon({
+        iconUrl:imgFolderPath+"/"+file,
+        iconSize:[50,50],
+        iconAnchor:[25,25]
+      })
+      //Create a marker with this icon
+      var marker = L.marker([0,0],{
+        icon:icon
+      });
+      marker.addTo(this.map).on('click', ( () => {
+        this.focus.fill(false);
+        this.focus[i] = true;
+      })).bindPopup("Pos "+i);
+      const currentLatLng = marker.getLatLng();
+      marker.setPopupContent("Pos "+i+1+" , Lng: "+currentLatLng.lng+" Lat: "+currentLatLng.lat);
+      this.markers.push(marker);
 
-    const currentLatLng1 = this.pos1.getLatLng();
-    var display: string = "Pos 1, Lng:"+currentLatLng1.lng+" Lat: "+currentLatLng1.lat;
-    this.pos1.setPopupContent(display);
+      //Create trail and polyline
+      var polyline = L.polyline([],{
+        color:colors[i],
+        weight: 4,
+        opacity: 0.8,
+        lineJoin: 'round',
+        dashArray: '5, 10',
+      }).addTo(this.map);
+      this.polylines.push(polyline);
+      this.trails.push([]);
 
-    const currentLatLng2 = this.pos2.getLatLng();
-    display = "Pos 2, Lng:"+currentLatLng2.lng+" Lat: "+currentLatLng2.lat;
-    this.pos2.setPopupContent(display);
-
-    this.trailPolyline1 = L.polyline([], {
-      color: 'blue',
-      weight: 4,
-      opacity: 0.8,
-      lineJoin: 'round',
-      dashArray: '5, 10',
+      i++;
     });
-    this.trailPolyline1.addTo(this.map);
-
-    this.trailPolyline2 = L.polyline([], {
-      color: 'red',
-      weight: 4,
-      opacity: 0.8,
-      lineJoin: 'round',
-      dashArray: '5, 10',
-    });
-    this.trailPolyline2.addTo(this.map);
+    
   }
 
-  updateCoords(coords1: L.LatLngLiteral,coords2: L.LatLngLiteral){
-    this.pos1.setLatLng(coords1);
-    this.pos2.setLatLng(coords2);
-    const currentLatLng1 = this.pos1.getLatLng();
-    const currentLatLng2 = this.pos2.getLatLng();
-
-    var display: string = "Pos 1, Lng:"+currentLatLng1.lng+" Lat: "+currentLatLng1.lat;
-    this.pos1.setPopupContent(display);
-    this.trail1.push([currentLatLng1.lat, currentLatLng1.lng]);
-    if (this.trail1.length > 40000) {
-      this.trail1.shift();
-    }    
-    this.trailPolyline1.setLatLngs(this.trail1);
-    this.pos1.bringToFront();
-    if (this.focusToggled1)
-          this.map.setView([currentLatLng1.lat, currentLatLng1.lng]);
-
-    display="Pos 2, Lng:"+currentLatLng2.lng+" Lat: "+currentLatLng2.lat;
-    this.pos2.setPopupContent(display);
-    this.trail2.push([currentLatLng2.lat, currentLatLng2.lng]);
-    if (this.trail2.length > 40000) {
-      this.trail2.shift();
-    }    
-    this.trailPolyline2.setLatLngs(this.trail2);
-    this.pos2.bringToFront();
-    if (this.focusToggled2)
-      this.map.setView([currentLatLng2.lat, currentLatLng2.lng]);
+  updateCoords(coords: L.LatLngLiteral[]){
+    for (let i = 0; i < 5; i++){
+      this.markers[i].setLatLng(coords[i]);
+      const currentLatLng = this.markers[i].getLatLng();
+      this.markers[i].setPopupContent("Pos " + i+1 +", Lng:"+currentLatLng.lng+" Lat: "+currentLatLng.lat);
+      this.trails[i].push([currentLatLng.lat,currentLatLng.lng]);
+      if (this.trails[i].length > 40000) {
+        this.trails[i].shift();
+      }   
+      this.polylines[i].setLatLngs(this.trails[i]);
+      if (this.focus[i])
+          this.map.setView([currentLatLng.lat, currentLatLng.lng]);
+    }
   }
 
   changeView(){
-    switch(this.numPoints){
-      case 0:
-        this.focusToggled1 = true;
-        this.focusToggled2 = false;
-        this.map.setView(this.pos1.getLatLng(),17);
-        break;
-      case 1:
-        this.focusToggled1 = false;
-        this.focusToggled2 = true;
-        this.map.setView(this.pos1.getLatLng(),17);
-        break;
-      default:
-        break;
-    }
-    this.numPoints = (this.numPoints + 1) % 2;
+    this.focus.fill(false);
+    this.focus[this.numPoints] = true;
+    this.map.setView(this.markers[this.numPoints].getLatLng(),17);
+    this.numPoints = (this.numPoints + 1) % 5;
   }  
+
+  resetZoom(){
+    this.focus.fill(false);
+    this.map.setView([47, 7], 7);
+  }
 
   ngOnDestroy() {
     this.map.remove();

@@ -155,19 +155,18 @@ async def pasweb(websocket: WebSocket):
         )
         try:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT id, timestamp, x, y FROM coordinates ORDER BY timestamp DESC LIMIT 2")
+                cursor.execute("SELECT id, timestamp, x, y FROM coordinates ORDER BY timestamp DESC LIMIT 5")
                 rows = cursor.fetchall()
-                positions = []
+                positions = {}
                 for row in rows:
                     id, timestamp, x, y = row
                     # Convert timestamp to Unix timestamp for consistent output
                     timestamp_unix = int(timestamp.timestamp())
-                    positions.append({
-                        "id": id,
+                    positions[id]= {
                         "timestamp": timestamp_unix,
                         "x": x,
                         "y": y
-                    })
+                    }
                     # Health check
                     #with open(file_path, 'a') as file:
                     #    file.write("3")

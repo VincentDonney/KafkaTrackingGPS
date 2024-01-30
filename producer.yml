@@ -26,3 +26,42 @@ services:
       - kafka
     networks:
       - kafka-net
+
+  kafka-producer3:
+    build: ./producer
+    container_name: kafka-producer3
+    environment:
+      - KAFKA_BROKER=kafka:9092
+      - id=3
+      - x=43.31945855038965 
+      - y=-0.3604954584934873
+    depends_on:
+      - kafka
+    networks:
+      - kafka-net
+
+  kafka-producer4:
+    build: ./producer
+    container_name: kafka-producer4
+    environment:
+      - KAFKA_BROKER=kafka:9092
+      - id=4
+      - x=53.331037208428306 
+      - y=-6.278139264804377 
+    depends_on:
+      - kafka
+    networks:
+      - kafka-net
+
+  kafka-producer5:
+    build: ./producer
+    container_name: kafka-producer5
+    environment:
+      - KAFKA_BROKER=kafka:9092
+      - id=5
+      - x=48.636780 
+      - y=-1.511305
+    depends_on:
+      - kafka
+    networks:
+      - kafka-net
