@@ -1,8 +1,9 @@
-<div class="map-container">
-    <button (click)="changeView()">Change View point</button>
-    <button (click)="resetZoom()">Reset Zoom</button>
-
-    <div class="map-frame">
-      <div id="map"></div>
-    </div>
+<div class="core">
+  <div class="buttons">
+    <button class="mh-button" (click)="changeView()">Track a different monster</button>
+    <button class="mh-button" (click)="resetZoom()">Reset Zoom</button>
+  </div>
+  <div class="map-container">
+    <div id="map"></div>
+  </div>
 </div>

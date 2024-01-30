@@ -1,39 +1,57 @@
-.map-container {
+.core{
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    margin: 30px;
+    background-color: #34495e;
 }
 
-.map-frame {
-border: 2px solid black;
-height: 100%;
-border: 1px solid #ddd;
-border-radius: 8px;
-overflow: hidden;
-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+.map-container {
+    width: 90%;
+    height: 90%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: auto;
+    margin-top: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
 #map {
-height: 100%;
+    height: 100%;
 }
 
-.map-info {
-margin-top: 10px;
-font-size: 16px;
-font-weight: bold;
-}
-
-/* Optional: Style for the marker popups */
 .leaflet-popup-content-wrapper {
-background: #fff;
-border-radius: 8px;
-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
 
 .leaflet-popup-content {
-padding: 10px;
+    padding: 10px;
 }
+
+.buttons{
+    text-align: left;
+}
+
+.mh-button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #ADD8E6; 
+    color: #000080; 
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .mh-button:hover {
+    background-color: #87CEEB; 
+  }
+  
 

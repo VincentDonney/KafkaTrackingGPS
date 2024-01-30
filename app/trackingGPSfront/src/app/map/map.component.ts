@@ -14,8 +14,6 @@ export class MapComponent implements AfterViewInit {
   private trails: any[][] = [];
   private polylines:L.Polyline[] = [];
   private focus = new Array(5).fill(false);
-  
-
   constructor(private websocket: WebsocketService) {}
 
   ngAfterViewInit(): void {
@@ -23,7 +21,7 @@ export class MapComponent implements AfterViewInit {
     this.websocket.connect();
     this.websocket.getMessages()?.subscribe((message: any)=> {
       //console.log(message)
-      if(message){
+      if(message!==undefined){
         var coords:L.LatLngLiteral[] = [];
         for (let i = 1; i < 6; i++){
           coords.push({lat:message[i.toString()]['x'], lng:message[i.toString()]['y']});
@@ -43,7 +41,7 @@ export class MapComponent implements AfterViewInit {
       "vaalstrax.png"
     ];
     const colors = ['black', 'red', 'green', 'orange', 'purple'];
-    this.map = L.map('map').setView([47, 7], 7).on('click', () => {
+    this.map = L.map('map').setView([47, 7], 5).on('click', () => {
       this.focus.fill(false);
     });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -104,6 +102,7 @@ export class MapComponent implements AfterViewInit {
   }
 
   changeView(){
+    const ostFolder = "assets/ost"
     this.focus.fill(false);
     this.focus[this.numPoints] = true;
     this.map.setView(this.markers[this.numPoints].getLatLng(),17);
@@ -112,7 +111,7 @@ export class MapComponent implements AfterViewInit {
 
   resetZoom(){
     this.focus.fill(false);
-    this.map.setView([47, 7], 7);
+    this.map.setView([47, 7], 5);
   }
 
   ngOnDestroy() {
