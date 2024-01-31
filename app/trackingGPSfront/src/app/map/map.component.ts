@@ -21,7 +21,7 @@ export class MapComponent implements AfterViewInit {
     this.websocket.connect();
     this.websocket.getMessages()?.subscribe((message: any)=> {
       console.log(message);
-      if(message!==undefined){
+      if(message!==undefined && Object.keys(message).length!=0){
         var coords:L.LatLngLiteral[] = [];
         for (let i = 1; i < 6; i++){
           coords.push({lat:message[i.toString()]['x'], lng:message[i.toString()]['y']});
@@ -41,6 +41,13 @@ export class MapComponent implements AfterViewInit {
       "vaalstrax.png"
     ];
     const colors = ['black', 'red', 'green', 'orange', 'purple'];
+    const defaultPos = [
+      [49.43742987885597,11.090147027822049],
+      [45.74505320159049,4.8542187705193],
+      [43.31945855038965,-0.3604954584934873],
+      [53.331037208428306,-6.278139264804377 ],
+      [48.636780,-1.511305]
+    ];
     this.map = L.map('map').setView([47, 7], 5).on('click', () => {
       this.focus.fill(false);
     });
@@ -59,7 +66,7 @@ export class MapComponent implements AfterViewInit {
         iconAnchor:[25,25]
       })
       //Create a marker with this icon
-      var marker = L.marker([0,0],{
+      var marker = L.marker([defaultPos[i][0],defaultPos[i][1]],{
         icon:icon
       });
       marker.addTo(this.map).on('click', ( () => {
@@ -67,7 +74,7 @@ export class MapComponent implements AfterViewInit {
         this.focus[i] = true;
       })).bindPopup("Pos "+i);
       const currentLatLng = marker.getLatLng();
-      marker.setPopupContent("Pos "+i+1+" , Lng: "+currentLatLng.lng+" Lat: "+currentLatLng.lat);
+      marker.setPopupContent("Pos "+(i+1)+" , Lng: "+currentLatLng.lng+" Lat: "+currentLatLng.lat);
       this.markers.push(marker);
 
       //Create trail and polyline
