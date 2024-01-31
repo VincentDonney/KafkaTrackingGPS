@@ -22,6 +22,7 @@ FROM nginx:alpine
 # Copy the built app from the 'builder' stage to NGINX html directory
 COPY --from=builder /app/dist/* /usr/share/nginx/html/
 
+# The website is hosted on port 4200
 EXPOSE 4200
 
 # Start NGINX server
