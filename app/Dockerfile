@@ -16,7 +16,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Run the python app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]
 
 
