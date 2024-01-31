@@ -5,9 +5,10 @@ services:
     build: ./app
     container_name: fastapi
     environment:
-      POSTGRES_DB: db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pwd
+      - host=database
+      - database=pg
+      - user=pg
+      - password=pg
     ports:
       - "8008:8000"
     depends_on:

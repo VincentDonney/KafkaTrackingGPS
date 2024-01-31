@@ -9,6 +9,7 @@ from psycopg2 import sql
 import json
 from datetime import datetime
 import time
+import os
 
 app = FastAPI(title="Fastapi")
 
@@ -51,11 +52,12 @@ async def push_message():
 # Pushes one message to the database
 def push_data_to_database(processed_data):
     conn = psycopg2.connect(
-        host="database",
-        database="pg",
-        user="pg",
-        password="pg"
-    )
+            host= os.getenv('host', '0'),
+            database= os.getenv('database', '0'),
+            user= os.getenv('user', '0'),
+            password= os.getenv('password', '0')
+        )
+
     values = message_processor(processed_data)
     try:
         with conn.cursor() as cursor:
@@ -88,10 +90,10 @@ def message_processor(input):
 @app.get("/get_messages")
 def get_messages():
     conn = psycopg2.connect(
-            host="database",
-            database="pg",
-            user="pg",
-            password="pg"
+            host= os.getenv('host', '0'),
+            database= os.getenv('database', '0'),
+            user= os.getenv('user', '0'),
+            password= os.getenv('password', '0')
         )
     try:
         with conn.cursor() as cursor:
