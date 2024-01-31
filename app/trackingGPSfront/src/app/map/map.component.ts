@@ -36,7 +36,7 @@ export class MapComponent implements AfterViewInit {
     this.websocket.connect();
     // wait for new messages and update coordinates of the markers
     this.websocket.getMessages()?.subscribe((message: any)=> {
-      console.log(message);
+      //console.log(message);
       if(message!==undefined && Object.keys(message).length!=0){
         // creates empty list to receive the coordinates of the markers
         var coords:L.LatLngLiteral[] = [];
