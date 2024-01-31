@@ -11,7 +11,7 @@ kafka_settings = {
     'bootstrap.servers': kafka_broker,
 }
 
-# Function to generate coordinates
+# Function to update coordinates (movement is generated randomly by small steps)
 def generate_coordinates(x, y):
     x = x + random.uniform(0.00005, 0.0006) * random.randint(-1, 1)
     y = y + random.uniform(0.00005, 0.0006) * random.randint(-1, 1)
@@ -20,6 +20,7 @@ def generate_coordinates(x, y):
 # Produce kafka message of coherently random position every 5s
 def produce_kafka_messages():
     producer = Producer(kafka_settings)
+    # Get id and initial positions from environnement variables
     id = os.getenv('id', '0')
     x = os.getenv('x', '0')
     y = os.getenv('y', '0')
