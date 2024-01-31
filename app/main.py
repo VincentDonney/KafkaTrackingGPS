@@ -30,6 +30,7 @@ async def push_message():
     consumer = Consumer(kafka_settings)
     consumer.subscribe(['coordinates'])
     try:
+        # Iterate everything until no message is left
         while True:
             msg = consumer.poll(1.0)
             if msg is None:
@@ -66,7 +67,7 @@ def push_data_to_database(processed_data):
     finally:
         conn.close()
     
-# Processes one message into a valid object for the database
+# Processes one Kafka message into a valid JSON object for the database
 def message_processor(input):
     message = ""
     for i in input:
@@ -84,7 +85,7 @@ def message_processor(input):
     }
     return values
 
-# Fetches last messages from the database
+# Fetches the latest messages from the database
 @app.get("/get_messages")
 def get_messages():
     conn = psycopg2.connect(
